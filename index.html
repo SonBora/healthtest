@@ -1,0 +1,1577 @@
+<!DOCTYPE html>
+<html lang="km" class="h-full bg-slate-950">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>សុខភាពយើង - Sokhapheap Yeang Healthcare Community</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Kantumruy Pro & Battambang for Khmer, Inter for English -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Battambang:wght@400;700&family=Inter:wght@400;500;600;700&family=Kantumruy+Pro:ital,wght@0,300..700;1,300..700&display=swap" rel="stylesheet">
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            khmerTeal: {
+              50: '#f0fdfa',
+              100: '#ccfbf1',
+              500: '#00A896',
+              700: '#0D5C75',
+              800: '#0a4659',
+              900: '#062d3a',
+            },
+            khmerGold: {
+              300: '#fde047',
+              400: '#facc15',
+              500: '#D4AF37',
+              600: '#b48f22',
+              700: '#8c6d15',
+            }
+          },
+          fontFamily: {
+            khmer: ['Kantumruy Pro', 'Battambang', 'sans-serif'],
+            sans: ['Inter', 'Kantumruy Pro', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Kantumruy Pro', 'Inter', sans-serif;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .kbach-pattern {
+      background-color: #0D5C75;
+      background-image: radial-gradient(#D4AF37 0.8px, transparent 0.8px), radial-gradient(#D4AF37 0.8px, #0D5C75 0.8px);
+      background-size: 24px 24px;
+      background-position: 0 0, 12px 12px;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.08); opacity: 0.4; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .pulse-urgent {
+      animation: pulse-ring 2s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 min-h-screen flex items-center justify-center p-0 md:p-4 text-slate-800">
+
+  <!-- Mobile Frame Container -->
+  <div class="w-full max-w-md h-screen md:h-[890px] bg-slate-50 flex flex-col shadow-2xl md:rounded-[36px] overflow-hidden relative border-0 md:border-4 border-slate-800">
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-12 left-1/2 -translate-x-1/2 z-50 w-80 pointer-events-none space-y-2"></div>
+
+    <!-- ========================================================================= -->
+    <!-- 1. ENFORCED AUTHENTICATION SCREEN (Sign In / Register with Validation)   -->
+    <!-- ========================================================================= -->
+    <div id="auth-lock-screen" class="absolute inset-0 bg-gradient-to-b from-khmerTeal-900 via-khmerTeal-800 to-slate-950 z-50 flex flex-col justify-between p-5 font-khmer overflow-y-auto no-scrollbar">
+      
+      <!-- Top Decorative Banner -->
+      <div class="text-center pt-6 space-y-2">
+        <div class="w-20 h-20 rounded-3xl bg-amber-500/20 border-2 border-khmerGold-400 p-1 flex items-center justify-center mx-auto shadow-2xl">
+          <div class="w-full h-full bg-khmerTeal-700 rounded-2xl flex items-center justify-center font-bold text-khmerGold-400 text-3xl border border-khmerGold-500/40">
+            ស
+          </div>
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold text-amber-100 flex items-center justify-center gap-2">
+            សុខភាពយើង
+            <span class="text-[10px] bg-khmerGold-500 text-slate-950 font-bold px-1.5 py-0.5 rounded">KH</span>
+          </h1>
+          <p class="text-xs text-emerald-200/90 mt-1" data-km="បណ្តាញចែករំលែក និងថែទាំសុខភាពកម្ពុជា" data-en="Cambodian Healthcare Community Network">
+            បណ្តាញចែករំលែក និងថែទាំសុខភាពកម្ពុជា
+          </p>
+        </div>
+      </div>
+
+      <!-- Auth Form Card -->
+      <div class="bg-white/95 backdrop-blur-md rounded-3xl p-5 shadow-2xl space-y-3.5 my-auto border border-khmerGold-500/30">
+        
+        <!-- Action Switcher: Login vs Sign Up -->
+        <div class="flex bg-slate-100 p-1 rounded-2xl text-xs font-bold text-center">
+          <button onclick="switchAuthAction('login')" id="auth-action-login" class="w-1/2 py-2 rounded-xl bg-khmerTeal-700 text-white shadow transition" data-km="ចូលគណនី" data-en="Sign In">ចូលគណនី</button>
+          <button onclick="switchAuthAction('register')" id="auth-action-register" class="w-1/2 py-2 rounded-xl text-slate-500 transition" data-km="បង្កើតគណនីថ្មី" data-en="Register">បង្កើតគណនីថ្មី</button>
+        </div>
+
+        <!-- Mode Toggle Tabs: Phone vs Email -->
+        <div class="flex border-b border-slate-200 text-xs text-center font-semibold">
+          <button onclick="switchAuthMode('phone')" id="auth-tab-phone" class="w-1/2 py-1.5 border-b-2 border-khmerTeal-700 text-khmerTeal-700" data-km="លេខទូរស័ព្ទ (+855)" data-en="Phone Number">លេខទូរស័ព្ទ (+855)</button>
+          <button onclick="switchAuthMode('email')" id="auth-tab-email" class="w-1/2 py-1.5 border-b-2 border-transparent text-slate-400" data-km="អ៊ីមែល" data-en="Email Address">អ៊ីមែល</button>
+        </div>
+
+        <!-- Register Name Input (Only shown on Sign Up) -->
+        <div id="auth-field-name" class="hidden space-y-1">
+          <label class="block text-[11px] font-bold text-slate-700" data-km="ឈ្មោះពេញរបស់អ្នក" data-en="Your Full Name">ឈ្មោះពេញរបស់អ្នក</label>
+          <input type="text" id="auth-name-input" placeholder="ឧទាហរណ៍៖ សុខា" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-khmerTeal-700">
+        </div>
+
+        <!-- Phone Input Block -->
+        <div id="auth-mode-phone" class="space-y-1">
+          <label class="block text-[11px] font-bold text-slate-700" data-km="លេខទូរស័ព្ទកម្ពុជា (+855)" data-en="Cambodian Phone (+855)">លេខទូរស័ព្ទកម្ពុជា (+855)</label>
+          <div class="flex items-center space-x-1.5">
+            <span class="bg-slate-100 border border-slate-200 text-slate-700 px-2.5 py-2 text-xs rounded-xl font-bold shrink-0">+855</span>
+            <input type="tel" id="auth-phone-input" placeholder="12345678" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-khmerTeal-700">
+          </div>
+        </div>
+
+        <!-- Email Input Block -->
+        <div id="auth-mode-email" class="space-y-1 hidden">
+          <label class="block text-[11px] font-bold text-slate-700" data-km="អាសយដ្ឋានអ៊ីមែល" data-en="Email Address">អាសយដ្ឋានអ៊ីមែល</label>
+          <input type="email" id="auth-email-input" placeholder="example@health.kh" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-khmerTeal-700">
+        </div>
+
+        <!-- Password Input -->
+        <div class="space-y-1">
+          <div class="flex items-center justify-between">
+            <label class="block text-[11px] font-bold text-slate-700" data-km="ពាក្យសម្ងាត់" data-en="Password">ពាក្យសម្ងាត់</label>
+            <span class="text-[10px] text-slate-400" data-km="យ៉ាងហោចណាស់ ៦ ខ្ទង់" data-en="Min 6 characters">យ៉ាងហោចណាស់ ៦ ខ្ទង់</span>
+          </div>
+          <input type="password" id="auth-password-input" placeholder="••••••••" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-khmerTeal-700">
+        </div>
+
+        <!-- Account Role Selection (Only shown on Sign Up) -->
+        <div id="auth-field-role" class="hidden space-y-1">
+          <label class="block text-[11px] font-bold text-slate-700" data-km="ប្រភេទគណនី" data-en="Account Role">ប្រភេទគណនី</label>
+          <select id="auth-role-select" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none">
+            <option value="General Member" data-km="សមាជិកទូទៅ (General Member)" data-en="General Member">សមាជិកទូទៅ (General Member)</option>
+            <option value="Healthcare Provider" data-km="គ្រូពេទ្យ / អ្នកជំនាញសុខភាព" data-en="Healthcare Provider">គ្រូពេទ្យ / អ្នកជំនាញសុខភាព</option>
+          </select>
+        </div>
+
+        <!-- Security Error Message Display -->
+        <div id="auth-error-box" class="hidden p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-[11px] font-bold flex items-center gap-1.5">
+          <i data-lucide="alert-triangle" class="w-4 h-4 shrink-0 text-rose-600"></i>
+          <span id="auth-error-msg">---</span>
+        </div>
+
+        <!-- Login / Register Submit Button -->
+        <button onclick="handleAuthSubmit()" class="w-full bg-gradient-to-r from-khmerTeal-800 to-khmerTeal-700 hover:from-khmerTeal-900 hover:to-khmerTeal-800 text-white font-bold py-3 rounded-2xl text-xs shadow-lg transition flex items-center justify-center gap-2 border border-khmerGold-500/40">
+          <i data-lucide="shield-check" class="w-4 h-4 text-khmerGold-400"></i>
+          <span id="auth-submit-btn-text" data-km="ចូលប្រើប្រាស់" data-en="Sign In">ចូលប្រើប្រាស់</span>
+        </button>
+      </div>
+
+      <!-- Footer Privacy Notice -->
+      <div class="text-center pb-2 text-[10px] text-slate-400 space-y-1">
+        <p data-km="🔒 ព័ត៌មាន និងគណនីរបស់អ្នកត្រូវបានការពារយ៉ាងមានសុវត្ថិភាព" data-en="🔒 Account and credentials are encrypted securely">🔒 ព័ត៌មាន និងគណនីរបស់អ្នកត្រូវបានការពារយ៉ាងមានសុវត្ថិភាព</p>
+        <div class="flex items-center justify-center gap-2 text-slate-300">
+          <button onclick="toggleLanguage('km')" class="hover:underline">ភាសាខ្មែរ 🇰🇭</button>
+          <span>•</span>
+          <button onclick="toggleLanguage('en')" class="hover:underline">English 🇬🇧</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- MAIN APP WRAPPER (Visible after Authentication)                           -->
+    <!-- ========================================================================= -->
+    <header class="bg-gradient-to-r from-khmerTeal-900 via-khmerTeal-700 to-khmerTeal-800 text-white pt-3 pb-3 px-4 relative z-10 shadow-md shrink-0">
+      <div class="h-1 w-full bg-gradient-to-r from-khmerGold-600 via-khmerGold-400 to-khmerGold-600 mb-2 rounded-full opacity-90"></div>
+
+      <div class="flex items-center justify-between gap-2">
+        <!-- Logo & User Status Header -->
+        <div class="flex items-center space-x-2">
+          <img id="header-user-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" class="w-10 h-10 rounded-full object-cover border-2 border-khmerGold-400 shadow shrink-0" alt="Avatar">
+          <div>
+            <div class="flex items-center space-x-1.5">
+              <h1 id="header-user-name" class="font-bold text-xs text-amber-100 font-khmer leading-none">សុខា</h1>
+              <span id="header-role-badge" class="text-[9px] bg-khmerGold-500 text-slate-950 font-bold px-1.5 py-0.2 rounded">Member</span>
+            </div>
+            <p id="header-account-contact" class="text-[10px] text-emerald-200/90 flex items-center gap-1 mt-0.5 font-khmer">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse"></span>
+              <span>+855 12 345 678</span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Language Toggle Button -->
+        <button onclick="toggleLanguage()" title="Switch Language" class="bg-khmerGold-500 hover:bg-khmerGold-600 text-slate-950 text-[11px] font-bold px-2.5 py-1 rounded-lg transition flex items-center gap-1 shadow">
+          <i data-lucide="globe" class="w-3.5 h-3.5"></i>
+          <span id="lang-indicator">EN</span>
+        </button>
+      </div>
+
+      <!-- Global Search Bar -->
+      <div class="mt-2.5 relative">
+        <input type="text" id="global-search-input" oninput="handleGlobalSearch()" placeholder="ស្វែងរកចំណេះដឹងសុខភាព ឬ មន្ទីរពេទ្យ..." data-km-placeholder="ស្វែងរកចំណេះដឹងសុខភាព ឬ មន្ទីរពេទ្យ..." data-en-placeholder="Search health tips or hospitals..." class="w-full bg-slate-900/60 border border-khmerGold-500/30 text-white text-xs placeholder-slate-300 rounded-full py-1.5 pl-8 pr-4 focus:outline-none focus:ring-1 focus:ring-khmerGold-400 transition" />
+        <i data-lucide="search" class="w-3.5 h-3.5 text-slate-300 absolute left-2.5 top-2.5"></i>
+      </div>
+    </header>
+
+    <!-- Navigation Views Container -->
+    <main id="main-container" class="flex-1 overflow-y-auto bg-slate-100 no-scrollbar relative pb-20">
+
+      <!-- ================= TAB 1: SHARED COMMUNITY FEED ================= -->
+      <section id="tab-home" class="p-3 space-y-3">
+        <!-- Khmer Healthcare Knowledge Banner -->
+        <div class="rounded-2xl kbach-pattern p-3.5 text-white shadow border border-khmerGold-500/40 relative overflow-hidden">
+          <div class="flex justify-between items-start relative z-10">
+            <div>
+              <span class="inline-flex items-center gap-1 bg-amber-500/20 border border-khmerGold-400/50 text-khmerGold-300 text-[10px] font-bold px-2 py-0.5 rounded-full font-khmer">
+                <i data-lucide="sparkles" class="w-3 h-3 text-khmerGold-400"></i>
+                <span data-km="បណ្តាញចែករំលែកសុខភាព" data-en="Health Community Network">បណ្តាញចែករំលែកសុខភាព</span>
+              </span>
+              <h2 class="text-sm font-bold text-amber-100 font-khmer mt-1.5" data-km="ចែករំលែក និងរៀនសូត្រពីសុខភាព" data-en="Share & Learn Healthcare Tips">ចែករំលែក និងរៀនសូត្រពីសុខភាព</h2>
+              <p class="text-[11px] text-emerald-100/90 font-khmer mt-0.5" data-km="ស្វែងរកមន្ទីរពេទ្យ និងអត្ថបទថែទាំសុខភាពពីអ្នកប្រើប្រាស់ទាំងអស់" data-en="Find nearby hospitals & verified posts from all members">ស្វែងរកមន្ទីរពេទ្យ និងអត្ថបទថែទាំសុខភាពពីអ្នកប្រើប្រាស់ទាំងអស់</p>
+            </div>
+            <a href="tel:119" class="bg-rose-600 hover:bg-rose-700 text-white text-[10px] font-bold px-2.5 py-1.5 rounded-xl flex flex-col items-center shadow-lg border border-rose-400 shrink-0">
+              <i data-lucide="phone-call" class="w-4 h-4 pulse-urgent"></i>
+              <span class="mt-0.5 font-khmer" data-km="សង្គ្រោះ 119" data-en="Hotline 119">សង្គ្រោះ 119</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Category Filter Buttons -->
+        <div class="flex space-x-1.5 overflow-x-auto no-scrollbar py-0.5 text-xs font-khmer">
+          <button onclick="filterFeedCategory('all')" class="feed-cat-btn bg-khmerTeal-700 text-white px-3 py-1 rounded-full font-medium whitespace-nowrap shadow-sm" data-km="ទាំងអស់" data-en="All Posts">ទាំងអស់</button>
+          <button onclick="filterFeedCategory('general')" class="feed-cat-btn bg-white text-slate-600 border border-slate-200 px-3 py-1 rounded-full font-medium whitespace-nowrap" data-km="សុខភាពទូទៅ" data-en="General Health">សុខភាពទូទៅ</button>
+          <button onclick="filterFeedCategory('nutrition')" class="feed-cat-btn bg-white text-slate-600 border border-slate-200 px-3 py-1 rounded-full font-medium whitespace-nowrap" data-km="អាហាររូបត្ថម្ភ" data-en="Nutrition">អាហាររូបត្ថម្ភ</button>
+          <button onclick="filterFeedCategory('pediatrics')" class="feed-cat-btn bg-white text-slate-600 border border-slate-200 px-3 py-1 rounded-full font-medium whitespace-nowrap" data-km="សុខភាពកុមារ" data-en="Pediatrics">សុខភាពកុមារ</button>
+          <button onclick="filterFeedCategory('mental')" class="feed-cat-btn bg-white text-slate-600 border border-slate-200 px-3 py-1 rounded-full font-medium whitespace-nowrap" data-km="សុខភាពផ្លូវចិត្ត" data-en="Mental Health">សុខភាពផ្លូវចិត្ត</button>
+          <button onclick="filterFeedCategory('firstaid')" class="feed-cat-btn bg-white text-slate-600 border border-slate-200 px-3 py-1 rounded-full font-medium whitespace-nowrap" data-km="ការសង្គ្រោះបឋម" data-en="First Aid">ការសង្គ្រោះបឋម</button>
+        </div>
+
+        <!-- Post Composer Card -->
+        <div class="bg-white rounded-2xl p-3 border border-slate-200 shadow-sm space-y-2 font-khmer">
+          <div class="flex items-center space-x-2">
+            <img id="composer-user-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" class="w-8 h-8 rounded-full object-cover border border-khmerTeal-700 shrink-0" alt="Avatar">
+            <input type="text" id="post-input-text" placeholder="ចែករំលែកសំនួរ ឬ ចំណេះដឹងសុខភាព..." data-km-placeholder="ចែករំលែកសំនួរ ឬ ចំណេះដឹងសុខភាព..." data-en-placeholder="Share health tip or question..." class="w-full bg-slate-100 text-xs rounded-xl px-3 py-2 border border-slate-200 focus:outline-none focus:ring-1 focus:ring-khmerTeal-700">
+          </div>
+
+          <!-- Attachment Preview Box -->
+          <div id="post-attachment-preview" class="hidden relative rounded-xl overflow-hidden border border-slate-200 max-h-40">
+            <img id="attachment-preview-img" src="" class="w-full h-36 object-cover" alt="Attachment">
+            <button onclick="clearPostAttachment()" class="absolute top-1 right-1 bg-slate-900/80 text-white rounded-full p-1 hover:bg-rose-600">
+              <i data-lucide="x" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+
+          <!-- Actions Bar -->
+          <div class="flex items-center justify-between pt-1 text-xs border-t border-slate-100">
+            <div class="flex items-center space-x-2">
+              <select id="post-category-select" class="bg-slate-100 text-[11px] text-slate-700 border border-slate-200 rounded-lg px-2 py-1 focus:outline-none">
+                <option value="general" data-km="សុខភាពទូទៅ" data-en="General Health">សុខភាពទូទៅ</option>
+                <option value="nutrition" data-km="អាហាររូបត្ថម្ភ" data-en="Nutrition">អាហាររូបត្ថម្ភ</option>
+                <option value="pediatrics" data-km="សុខភាពកុមារ" data-en="Pediatrics">សុខភាពកុមារ</option>
+                <option value="mental" data-km="សុខភាពផ្លូវចិត្ត" data-en="Mental Health">សុខភាពផ្លូវចិត្ត</option>
+                <option value="firstaid" data-km="ការសង្គ្រោះបឋម" data-en="First Aid">ការសង្គ្រោះបឋម</option>
+              </select>
+
+              <label class="cursor-pointer text-slate-500 hover:text-khmerTeal-700 flex items-center gap-1 text-[11px]">
+                <i data-lucide="image" class="w-4 h-4 text-emerald-600"></i>
+                <span data-km="រូបភាព" data-en="Photo">រូបភាព</span>
+                <input type="file" id="local-image-input" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+              </label>
+            </div>
+
+            <button onclick="createNewPost()" class="bg-khmerTeal-700 hover:bg-khmerTeal-800 text-white font-semibold px-3 py-1.5 rounded-lg text-xs transition shadow-sm flex items-center gap-1">
+              <i data-lucide="send" class="w-3.5 h-3.5"></i>
+              <span data-km="ផុសអត្ថបទ" data-en="Publish">ផុសអត្ថបទ</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Feed List Container -->
+        <div id="posts-feed-container" class="space-y-3"></div>
+      </section>
+
+      <!-- ================= TAB 2: REAL GOOGLE MAPS & HOSPITALS ================= -->
+      <section id="tab-map" class="p-3 space-y-3 hidden">
+        <div class="bg-white rounded-2xl p-3 border border-slate-200 shadow-sm space-y-2 font-khmer">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+              <i data-lucide="map-pin" class="w-4 h-4 text-rose-600"></i>
+              <span data-km="ជ្រើសរើសតំបន់ / ខេត្ត" data-en="Select Province / Region">ជ្រើសរើសតំបន់ / ខេត្ត</span>
+            </span>
+            <button onclick="requestUserLocation()" class="text-[10px] text-khmerTeal-700 bg-teal-50 px-2 py-1 rounded-lg border border-teal-200 font-bold flex items-center gap-1">
+              <i data-lucide="crosshair" class="w-3 h-3"></i>
+              <span data-km="ទីតាំងខ្ញុំ" data-en="My GPS">ទីតាំងខ្ញុំ</span>
+            </button>
+          </div>
+
+          <div class="flex space-x-1.5 overflow-x-auto no-scrollbar py-0.5 text-xs">
+            <button onclick="updateMapLocation('hospitals in Phnom Penh, Cambodia', 'រាជធានីភ្នំពេញ')" class="region-btn bg-khmerTeal-700 text-white px-3 py-1 rounded-full font-medium whitespace-nowrap shadow-sm">រាជធានីភ្នំពេញ</button>
+            <button onclick="updateMapLocation('hospitals in Siem Reap, Cambodia', 'ខេត្តសៀមរាប')" class="region-btn bg-white text-slate-600 border border-slate-200 px-3 py-1 rounded-full font-medium whitespace-nowrap">សៀមរាប</button>
+            <button onclick="updateMapLocation('hospitals in Battambang, Cambodia', 'ខេត្តបាត់ដំបង')" class="region-btn bg-white text-slate-600 border border-slate-200 px-3 py-1 rounded-full font-medium whitespace-nowrap">បាត់ដំបង</button>
+            <button onclick="updateMapLocation('hospitals in Sihanoukville, Cambodia', 'ខេត្តព្រះសីហនុ')" class="region-btn bg-white text-slate-600 border border-slate-200 px-3 py-1 rounded-full font-medium whitespace-nowrap">ព្រះសីហនុ</button>
+          </div>
+        </div>
+
+        <!-- Google Maps Embed Canvas -->
+        <div class="relative w-full h-72 bg-slate-200 rounded-2xl overflow-hidden shadow border border-slate-300">
+          <iframe 
+            id="google-maps-iframe" 
+            class="w-full h-full border-0" 
+            loading="lazy" 
+            allowfullscreen 
+            referrerpolicy="no-referrer-when-downgrade"
+            src="https://www.google.com/maps?q=hospitals+in+Phnom+Penh,+Cambodia&output=embed">
+          </iframe>
+        </div>
+
+        <!-- Hospital Filters -->
+        <div class="flex space-x-1.5 overflow-x-auto no-scrollbar py-0.5 text-xs font-khmer">
+          <button onclick="filterHospitals('all')" class="hosp-filter-btn bg-khmerTeal-700 text-white px-3 py-1 rounded-full font-medium whitespace-nowrap shadow-sm" data-km="ទាំងអស់" data-en="All Facilities">ទាំងអស់</button>
+          <button onclick="filterHospitals('public')" class="hosp-filter-btn bg-white text-slate-600 border border-slate-200 px-3 py-1 rounded-full font-medium whitespace-nowrap" data-km="មន្ទីរពេទ្យរដ្ឋ" data-en="Public Hospital">មន្ទីរពេទ្យរដ្ឋ</button>
+          <button onclick="filterHospitals('private')" class="hosp-filter-btn bg-white text-slate-600 border border-slate-200 px-3 py-1 rounded-full font-medium whitespace-nowrap" data-km="មន្ទីរពេទ្យឯកជន" data-en="Private Clinic">មន្ទីរពេទ្យឯកជន</button>
+          <button onclick="filterHospitals('24h')" class="hosp-filter-btn bg-white text-slate-600 border border-slate-200 px-3 py-1 rounded-full font-medium whitespace-nowrap" data-km="បន្ទាន់ ២៤ម៉ោង" data-en="24/7 Emergency">បន្ទាន់ ២៤ម៉ោង</button>
+        </div>
+
+        <!-- Hospital Directory -->
+        <div id="hospitals-list-container" class="space-y-2.5"></div>
+      </section>
+
+      <!-- ================= TAB 3: CREATE HEALTH POST ================= -->
+      <section id="tab-create" class="p-3 space-y-3 hidden">
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-3 font-khmer">
+          <div class="border-b border-slate-100 pb-2 flex items-center justify-between">
+            <h2 class="font-bold text-sm text-slate-800 flex items-center gap-1.5">
+              <i data-lucide="pen-tool" class="w-4 h-4 text-khmerTeal-700"></i>
+              <span data-km="ចែករំលែកអត្ថបទ ឬ ចំណេះដឹងសុខភាព" data-en="Create Health Knowledge Post">ចែករំលែកអត្ថបទ ឬ ចំណេះដឹងសុខភាព</span>
+            </h2>
+          </div>
+
+          <div class="space-y-2.5">
+            <div>
+              <label class="block text-[11px] font-bold text-slate-700 mb-1" data-km="ប្រភេទអត្ថបទ" data-en="Category">ប្រភេទអត្ថបទ</label>
+              <select id="tab-create-category" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none">
+                <option value="general">សុខភាពទូទៅ (General Health)</option>
+                <option value="nutrition">អាហាររូបត្ថម្ភ (Nutrition)</option>
+                <option value="pediatrics">សុខភាពកុមារ (Pediatrics)</option>
+                <option value="mental">សុខភាពផ្លូវចិត្ត (Mental Health)</option>
+                <option value="firstaid">ការសង្គ្រោះបឋម (First Aid)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-bold text-slate-700 mb-1" data-km="ខ្លឹមសារអត្ថបទ" data-en="Post Content">ខ្លឹមសារអត្ថបទ</label>
+              <textarea id="tab-create-text" rows="5" placeholder="សរសេរព័ត៌មាន ឬ បទពិសោធន៍ថែទាំសុខភាពរបស់អ្នកនៅទីនេះ..." data-km-placeholder="សរសេរព័ត៌មាន ឬ បទពិសោធន៍ថែទាំសុខភាពរបស់អ្នកនៅទីនេះ..." data-en-placeholder="Write your health tip or advice here..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:outline-none focus:ring-1 focus:ring-khmerTeal-700"></textarea>
+            </div>
+
+            <!-- Upload Attachment -->
+            <div>
+              <label class="block text-[11px] font-bold text-slate-700 mb-1" data-km="ភ្ជាប់រូបភាព" data-en="Attach Image">ភ្ជាប់រូបភាព</label>
+              <div onclick="document.getElementById('full-image-input').click()" class="border-2 border-dashed border-slate-300 rounded-2xl p-4 text-center cursor-pointer hover:border-khmerTeal-700 transition bg-slate-50">
+                <i data-lucide="upload-cloud" class="w-8 h-8 text-khmerTeal-700 mx-auto mb-1"></i>
+                <p class="text-xs text-slate-600 font-semibold" data-km="ចុចនៅទីនេះដើម្បីជ្រើសរើសរូបភាព" data-en="Click here to upload image">ចុចនៅទីនេះដើម្បីជ្រើសរើសរូបភាព</p>
+                <input type="file" id="full-image-input" accept="image/*" class="hidden" onchange="handleFullImageUpload(event)">
+              </div>
+              <div id="full-attachment-preview" class="hidden mt-2 relative rounded-xl overflow-hidden border border-slate-200 max-h-48">
+                <img id="full-preview-img" src="" class="w-full h-44 object-cover" alt="Preview">
+              </div>
+            </div>
+
+            <button onclick="submitFullPost()" class="w-full bg-khmerTeal-700 hover:bg-khmerTeal-800 text-white font-bold py-2.5 rounded-xl text-xs shadow transition flex items-center justify-center gap-1.5">
+              <i data-lucide="send" class="w-4 h-4"></i>
+              <span data-km="ផុសអត្ថបទភ្លាមៗ" data-en="Publish Now">ផុសអត្ថបទភ្លាមៗ</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TAB 4: NOTIFICATIONS ================= -->
+      <section id="tab-notifications" class="p-3 space-y-3 hidden font-khmer">
+        <div class="bg-white rounded-2xl p-3.5 border border-slate-200 shadow-sm space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+            <h3 class="font-bold text-xs text-slate-800 flex items-center gap-1.5">
+              <i data-lucide="bell" class="w-4 h-4 text-khmerTeal-700"></i>
+              <span data-km="ការជូនដំណឹងសុខភាព" data-en="Health Notifications">ការជូនដំណឹងសុខភាព</span>
+            </h3>
+            <button onclick="showToastNotification('បានសម្អាតការជូនដំណឹង')" class="text-[10px] text-slate-400 hover:text-slate-600 font-semibold" data-km="សម្អាត" data-en="Clear All">សម្អាត</button>
+          </div>
+
+          <div class="space-y-2 text-xs">
+            <div class="p-2.5 bg-teal-50 border border-teal-100 rounded-xl flex items-start space-x-2.5">
+              <div class="w-7 h-7 rounded-full bg-khmerTeal-700 text-white flex items-center justify-center shrink-0 mt-0.5">
+                <i data-lucide="shield-check" class="w-4 h-4"></i>
+              </div>
+              <div class="flex-1">
+                <p class="font-bold text-slate-800 text-[11px]" data-km="គណនីរបស់អ្នកត្រូវបានបង្កើតដោយជោគជ័យ!" data-en="Account Created Successfully!">គណនីរបស់អ្នកត្រូវបានបង្កើតដោយជោគជ័យ!</p>
+                <p class="text-[10px] text-slate-500 mt-0.5" data-km="សូមស្វាគមន៍មកកាន់បណ្តាញសុខភាពយើង។" data-en="Welcome to Sokhapheap Yeang Health Community.">សូមស្វាគមន៍មកកាន់បណ្តាញសុខភាពយើង។</p>
+                <span class="text-[9px] text-slate-400 mt-1 block">១០ នាទីមុន</span>
+              </div>
+            </div>
+
+            <div class="p-2.5 bg-slate-50 border border-slate-100 rounded-xl flex items-start space-x-2.5">
+              <div class="w-7 h-7 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center shrink-0 mt-0.5">
+                <i data-lucide="heart" class="w-4 h-4"></i>
+              </div>
+              <div class="flex-1">
+                <p class="font-bold text-slate-800 text-[11px]" data-km="លោកគ្រូពេទ្យ ចន្ទថូ បានចូលចិត្តអត្ថបទរបស់អ្នក" data-en="Dr. Chanthou liked your health post">លោកគ្រូពេទ្យ ចន្ទថូ បានចូលចិត្តអត្ថបទរបស់អ្នក</p>
+                <p class="text-[10px] text-slate-500 mt-0.5" data-km="អត្ថបទស្តីពីការសង្គ្រោះបឋម" data-en="Article regarding First Aid tips">អត្ថបទស្តីពីការសង្គ្រោះបឋម</p>
+                <span class="text-[9px] text-slate-400 mt-1 block">១ ម៉ោងមុន</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TAB 5: PERSONAL ACCOUNT & SETTINGS ================= -->
+      <section id="tab-profile" class="p-3 space-y-3 hidden font-khmer">
+        
+        <!-- User Profile Card -->
+        <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm relative overflow-hidden space-y-3">
+          <div class="h-20 bg-gradient-to-r from-khmerTeal-900 via-khmerTeal-700 to-khmerTeal-800 absolute top-0 left-0 right-0"></div>
+          
+          <div class="relative z-10 pt-4 flex items-end justify-between">
+            <div class="flex items-center space-x-3">
+              <img id="profile-card-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80" class="w-16 h-16 rounded-full border-2 border-white object-cover shadow-md bg-white shrink-0" alt="Avatar">
+              <div>
+                <h3 id="profile-card-name" class="font-bold text-sm text-slate-800">សុខា</h3>
+                <p id="profile-card-handle" class="text-[11px] text-khmerTeal-700 font-semibold">+855 12 345 678</p>
+                <span id="profile-card-role" class="inline-block mt-0.5 bg-amber-100 text-amber-900 border border-amber-300 text-[9px] px-2 py-0.2 rounded-full font-bold">General Member</span>
+              </div>
+            </div>
+
+            <button onclick="openEditProfileModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 text-[11px] font-bold px-3 py-1.5 rounded-xl transition flex items-center gap-1">
+              <i data-lucide="user-cog" class="w-3.5 h-3.5"></i>
+              <span data-km="កែប្រែ" data-en="Edit">កែប្រែ</span>
+            </button>
+          </div>
+
+          <!-- User Stats Counters -->
+          <div class="grid grid-cols-3 gap-2 pt-3 border-t border-slate-100 text-center text-xs">
+            <div class="bg-slate-50 p-2 rounded-xl">
+              <p class="font-bold text-khmerTeal-700 text-sm" id="user-stat-posts">0</p>
+              <p class="text-[10px] text-slate-500" data-km="អត្ថបទ" data-en="Posts">អត្ថបទ</p>
+            </div>
+            <div class="bg-slate-50 p-2 rounded-xl">
+              <p class="font-bold text-khmerTeal-700 text-sm" id="user-stat-saved">1</p>
+              <p class="text-[10px] text-slate-500" data-km="បានរក្សាទុក" data-en="Bookmarks">បានរក្សាទុក</p>
+            </div>
+            <div class="bg-slate-50 p-2 rounded-xl">
+              <p class="font-bold text-khmerTeal-700 text-sm" id="user-stat-joined">2026</p>
+              <p class="text-[10px] text-slate-500" data-km="កាលបរិច្ឆេទ" data-en="Joined">កាលបរិច្ឆេទ</p>
+            </div>
+          </div>
+
+          <!-- User Bio -->
+          <div class="text-xs text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+            <p id="profile-card-bio">សូមស្វាគមន៍មកកាន់គណនីសុខភាពខ្ញុំ! ចូលចិត្តថែទាំសុខភាព និងចែករំលែកបទពិសោធន៍។</p>
+          </div>
+        </div>
+
+        <!-- Settings Menu -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden divide-y divide-slate-100 text-xs">
+          <div class="p-3 bg-slate-50 font-bold text-slate-700 flex items-center justify-between">
+            <span data-km="ការកំណត់គណនីផ្ទាល់ខ្លួន" data-en="Personal Settings">ការកំណត់គណនីផ្ទាល់ខ្លួន</span>
+            <i data-lucide="settings" class="w-4 h-4 text-slate-400"></i>
+          </div>
+
+          <button onclick="openEditProfileModal()" class="w-full p-3 flex items-center justify-between hover:bg-slate-50 text-left">
+            <div class="flex items-center space-x-2.5">
+              <div class="w-7 h-7 rounded-lg bg-teal-50 text-khmerTeal-700 flex items-center justify-center">
+                <i data-lucide="user" class="w-4 h-4"></i>
+              </div>
+              <span data-km="ព័ត៌មានគណនី និងរូបថត" data-en="Profile Info & Avatar">ព័ត៌មានគណនី និងរូបថត</span>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+          </button>
+
+          <button onclick="openChangePasswordModal()" class="w-full p-3 flex items-center justify-between hover:bg-slate-50 text-left">
+            <div class="flex items-center space-x-2.5">
+              <div class="w-7 h-7 rounded-lg bg-amber-50 text-khmerGold-600 flex items-center justify-center">
+                <i data-lucide="key-round" class="w-4 h-4"></i>
+              </div>
+              <span data-km="ផ្លាស់ប្តូរពាក្យសម្ងាត់" data-en="Change Password">ផ្លាស់ប្តូរពាក្យសម្ងាត់</span>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+          </button>
+
+          <button onclick="toggleLanguage()" class="w-full p-3 flex items-center justify-between hover:bg-slate-50 text-left">
+            <div class="flex items-center space-x-2.5">
+              <div class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <i data-lucide="languages" class="w-4 h-4"></i>
+              </div>
+              <span data-km="ភាសាប្រើប្រាស់ (Khmer / English)" data-en="Display Language">ភាសាប្រើប្រាស់ (Khmer / English)</span>
+            </div>
+            <span class="text-[11px] font-bold text-khmerTeal-700" id="profile-lang-indicator">ភាសាខ្មែរ 🇰🇭</span>
+          </button>
+
+          <button onclick="handleUserLogout()" class="w-full p-3 flex items-center justify-between hover:bg-rose-50 text-rose-600 text-left transition font-bold">
+            <div class="flex items-center space-x-2.5">
+              <div class="w-7 h-7 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center">
+                <i data-lucide="log-out" class="w-4 h-4"></i>
+              </div>
+              <span data-km="ចាកចេញពីគណនី (Log Out)" data-en="Log Out Account">ចាកចេញពីគណនី (Log Out)</span>
+            </div>
+            <i data-lucide="arrow-right" class="w-4 h-4 text-rose-400"></i>
+          </button>
+        </div>
+
+        <!-- Saved Bookmarks Box -->
+        <div class="bg-white rounded-2xl p-3 border border-slate-200 shadow-sm space-y-2">
+          <h4 class="font-bold text-xs text-slate-800 flex items-center gap-1.5">
+            <i data-lucide="bookmark" class="w-4 h-4 text-khmerGold-600"></i>
+            <span data-km="អត្ថបទបានរក្សាទុក" data-en="Saved Health Articles">អត្ថបទបានរក្សាទុក</span>
+          </h4>
+          <div id="saved-bookmarks-container" class="space-y-1.5 text-xs"></div>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- ========================================================================= -->
+    <!-- MODALS & OVERLAYS                                                         -->
+    <!-- ========================================================================= -->
+
+    <!-- Edit Profile Modal -->
+    <div id="modal-edit-profile" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 hidden font-khmer">
+      <div class="w-full max-w-sm bg-white rounded-3xl p-4 shadow-2xl space-y-3 relative border border-slate-200">
+        <button onclick="closeEditProfileModal()" class="absolute top-3 right-3 text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+
+        <h3 class="font-bold text-sm text-slate-800 border-b border-slate-100 pb-2" data-km="កែប្រែព័ត៌មានគណនីផ្ទាល់ខ្លួន" data-en="Edit Personal Profile">កែប្រែព័ត៌មានគណនីផ្ទាល់ខ្លួន</h3>
+
+        <div class="space-y-2.5">
+          <div class="text-center">
+            <img id="edit-avatar-preview" src="" class="w-16 h-16 rounded-full object-cover border-2 border-khmerTeal-700 mx-auto shadow" alt="Avatar">
+            <label class="cursor-pointer text-[11px] font-bold text-khmerTeal-700 hover:underline mt-1 inline-block">
+              <span data-km="ផ្លាស់ប្តូររូបភាព" data-en="Change Photo">ផ្លាស់ប្តូររូបភាព</span>
+              <input type="file" id="edit-avatar-file" accept="image/*" class="hidden" onchange="handleAvatarFileChange(event)">
+            </label>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-slate-700 mb-0.5" data-km="ឈ្មោះបង្ហាញ" data-en="Display Name">ឈ្មោះបង្ហាញ</label>
+            <input type="text" id="edit-name-input" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs focus:outline-none">
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-slate-700 mb-0.5" data-km="ព័ត៌មានសង្ខេប (Bio)" data-en="Profile Bio">ព័ត៌មានសង្ខេប (Bio)</label>
+            <textarea id="edit-bio-input" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs focus:outline-none"></textarea>
+          </div>
+
+          <button onclick="saveUserProfileChanges()" class="w-full bg-khmerTeal-700 hover:bg-khmerTeal-800 text-white font-bold py-2.5 rounded-xl text-xs shadow transition" data-km="រក្សាទុកការប្រែប្រួល" data-en="Save Profile Changes">
+            រក្សាទុកការប្រែប្រួល
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div id="modal-change-password" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 hidden font-khmer">
+      <div class="w-full max-w-sm bg-white rounded-3xl p-4 shadow-2xl space-y-3 relative border border-slate-200">
+        <button onclick="closeChangePasswordModal()" class="absolute top-3 right-3 text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+
+        <h3 class="font-bold text-sm text-slate-800 border-b border-slate-100 pb-2" data-km="ផ្លាស់ប្តូរពាក្យសម្ងាត់" data-en="Change Password">ផ្លាស់ប្តូរពាក្យសម្ងាត់</h3>
+
+        <div class="space-y-2.5">
+          <div>
+            <label class="block text-[11px] font-bold text-slate-700 mb-0.5" data-km="ពាក្យសម្ងាត់ចាស់" data-en="Current Password">ពាក្យសម្ងាត់ចាស់</label>
+            <input type="password" id="change-old-password" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs focus:outline-none">
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-slate-700 mb-0.5" data-km="ពាក្យសម្ងាត់ថ្មី (យ៉ាងហោចណាស់ ៦ ខ្ទង់)" data-en="New Password (Min 6 chars)">ពាក្យសម្ងាត់ថ្មី (យ៉ាងហោចណាស់ ៦ ខ្ទង់)</label>
+            <input type="password" id="change-new-password" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs focus:outline-none">
+          </div>
+
+          <div id="change-pass-error" class="hidden text-rose-600 text-[10px] font-bold"></div>
+
+          <button onclick="saveNewPassword()" class="w-full bg-khmerTeal-700 hover:bg-khmerTeal-800 text-white font-bold py-2.5 rounded-xl text-xs shadow transition" data-km="រក្សាទុកពាក្យសម្ងាត់ថ្មី" data-en="Save New Password">
+            រក្សាទុកពាក្យសម្ងាត់ថ្មី
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comments Modal -->
+    <div id="modal-comments" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-end justify-center p-0 hidden font-khmer">
+      <div class="w-full max-w-md bg-white rounded-t-3xl h-[70vh] flex flex-col shadow-2xl overflow-hidden">
+        <div class="p-3 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+          <h3 class="font-bold text-xs text-slate-800 flex items-center gap-1.5">
+            <i data-lucide="message-square" class="w-4 h-4 text-khmerTeal-700"></i>
+            <span data-km="មតិយោបល់អត្ថបទ" data-en="Post Comments">មតិយោបល់អត្ថបទ</span>
+          </h3>
+          <button onclick="closeCommentsModal()" class="p-1 text-slate-500">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <div id="comments-list-container" class="flex-1 p-3 overflow-y-auto space-y-2 text-xs"></div>
+
+        <div class="p-2.5 bg-white border-t border-slate-200 flex items-center space-x-2">
+          <input type="text" id="comment-input-text" placeholder="សរសេរមតិ..." data-km-placeholder="សរសេរមតិ..." data-en-placeholder="Write comment..." class="flex-1 bg-slate-100 border border-slate-200 rounded-full px-3 py-1.5 text-xs focus:outline-none">
+          <button onclick="submitNewComment()" class="bg-khmerTeal-700 text-white px-3 py-1.5 rounded-full text-xs font-semibold" data-km="បញ្ជូន" data-en="Send">
+            បញ្ជូន
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hospital Detail Modal -->
+    <div id="modal-hospital-detail" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-end justify-center p-0 hidden">
+      <div class="w-full max-w-md bg-white rounded-t-3xl p-4 space-y-3 shadow-2xl font-khmer">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+          <div>
+            <h3 id="hosp-detail-title" class="font-bold text-sm text-slate-800">---</h3>
+            <span id="hosp-detail-badge" class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">---</span>
+          </div>
+          <button onclick="closeHospitalDetail()" class="p-1 text-slate-500">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <div id="hosp-detail-body" class="space-y-2 text-xs text-slate-600"></div>
+
+        <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
+          <a id="hosp-detail-call" href="#" class="bg-rose-600 text-white font-bold py-2 rounded-xl text-center text-xs flex items-center justify-center gap-1 shadow">
+            <i data-lucide="phone" class="w-3.5 h-3.5"></i>
+            <span data-km="ទូរស័ព្ទបន្ទាន់" data-en="Call Emergency">ទូរស័ព្ទបន្ទាន់</span>
+          </a>
+          <a id="hosp-detail-nav" href="#" target="_blank" class="bg-khmerTeal-700 text-white font-bold py-2 rounded-xl text-xs flex items-center justify-center gap-1 shadow">
+            <i data-lucide="navigation" class="w-3.5 h-3.5"></i>
+            <span data-km="នាំផ្លូវ (Google Maps)" data-en="Directions">នាំផ្លូវ (Google Maps)</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5-Tab Navigation Bar -->
+    <nav class="bg-white border-t border-slate-200 h-16 flex items-center justify-around fixed bottom-0 left-0 right-0 max-w-md mx-auto z-40 px-1">
+      <button onclick="switchTab('tab-home')" id="nav-tab-home" class="nav-item active-nav flex flex-col items-center justify-center w-full h-full text-khmerTeal-700">
+        <i data-lucide="newspaper" class="w-5 h-5"></i>
+        <span class="text-[9px] font-semibold mt-0.5 font-khmer" data-km="ព័ត៌មាន" data-en="Feed">ព័ត៌មាន</span>
+      </button>
+
+      <button onclick="switchTab('tab-map')" id="nav-tab-map" class="nav-item flex flex-col items-center justify-center w-full h-full text-slate-400 hover:text-khmerTeal-700">
+        <i data-lucide="map" class="w-5 h-5"></i>
+        <span class="text-[9px] font-semibold mt-0.5 font-khmer" data-km="ផែនទី" data-en="Hospitals">ផែនទី</span>
+      </button>
+
+      <button onclick="switchTab('tab-create')" id="nav-tab-create" class="nav-item flex flex-col items-center justify-center w-full h-full text-slate-400 hover:text-khmerTeal-700">
+        <i data-lucide="plus-circle" class="w-5 h-5"></i>
+        <span class="text-[9px] font-semibold mt-0.5 font-khmer" data-km="ចែករំលែក" data-en="Post">ចែករំលែក</span>
+      </button>
+
+      <button onclick="switchTab('tab-notifications')" id="nav-tab-notifications" class="nav-item flex flex-col items-center justify-center w-full h-full text-slate-400 hover:text-khmerTeal-700">
+        <i data-lucide="bell" class="w-5 h-5"></i>
+        <span class="text-[9px] font-semibold mt-0.5 font-khmer" data-km="ជូនដំណឹង" data-en="Alerts">ជូនដំណឹង</span>
+      </button>
+
+      <button onclick="switchTab('tab-profile')" id="nav-tab-profile" class="nav-item flex flex-col items-center justify-center w-full h-full text-slate-400 hover:text-khmerTeal-700">
+        <i data-lucide="user" class="w-5 h-5"></i>
+        <span class="text-[9px] font-semibold mt-0.5 font-khmer" data-km="គណនី" data-en="Profile">គណនី</span>
+      </button>
+    </nav>
+
+  </div>
+
+  <!-- Core JavaScript Architecture -->
+  <script type="module">
+
+    // Application Global State
+    window.currentLanguage = 'km';
+    window.authAction = 'login'; // 'login' or 'register'
+    window.authMode = 'phone';   // 'phone' or 'email'
+    window.selectedImageAttachment = null;
+    window.selectedFullImageAttachment = null;
+    window.selectedAvatarAttachment = null;
+    window.activePostCommentId = null;
+
+    // Accounts Database Persistence (Stored in LocalStorage)
+    const STORAGE_KEY_ACCOUNTS = 'sokhapheap_accounts_db';
+    const STORAGE_KEY_SESSION = 'sokhapheap_active_session';
+
+    // Seed default verified account records
+    const DEFAULT_ACCOUNTS = [
+      {
+        uid: 'user-001',
+        contactKey: '+85512345678',
+        name: 'សុខា (Sokha)',
+        passwordHash: '123456',
+        role: 'General Member',
+        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+        bio: 'សូមស្វាគមន៍មកកាន់គណនីសុខភាពខ្ញុំ! ចូលចិត្តថែទាំសុខភាព និងចែករំលែកបទពិសោធន៍។',
+        joinedYear: '2026'
+      },
+      {
+        uid: 'user-002',
+        contactKey: 'doctor@health.kh',
+        name: 'លោកគ្រូពេទ្យ ចន្ទថូ (Dr. Chanthou)',
+        passwordHash: 'doctor123',
+        role: 'Healthcare Provider',
+        avatar: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=200&q=80',
+        bio: 'គ្រូពេទ្យឯកទេសជំងឺទូទៅ និងអាហាររូបត្ថម្ភ។',
+        joinedYear: '2025'
+      }
+    ];
+
+    // Load registered accounts
+    let storedAccounts = localStorage.getItem(STORAGE_KEY_ACCOUNTS);
+    window.registeredAccounts = storedAccounts ? JSON.parse(storedAccounts) : DEFAULT_ACCOUNTS;
+    if (!storedAccounts) {
+      localStorage.setItem(STORAGE_KEY_ACCOUNTS, JSON.stringify(window.registeredAccounts));
+    }
+
+    // Active Logged-in Session
+    const activeSession = localStorage.getItem(STORAGE_KEY_SESSION);
+    window.currentUser = activeSession ? JSON.parse(activeSession) : null;
+
+    // Hospitals Data
+    window.hospitalsData = [
+      {
+        id: 'calmette',
+        nameKm: 'មន្ទីរពេទ្យកាល់ម៉ែត (Calmette Hospital)',
+        nameEn: 'Calmette Hospital',
+        type: 'public',
+        addressKm: 'មហាវិថីព្រះមុនីវង្ស សង្កាត់ស្រះចក រាជធានីភ្នំពេញ',
+        addressEn: 'Monivong Blvd, Srah Chak, Phnom Penh',
+        distanceKm: '3.2',
+        phone: '023 426 948',
+        emergency24h: true,
+        specialtiesKm: ['សង្គ្រោះបន្ទាន់ ២៤/៧', 'សរសៃឈាមបេះដូង', 'វះកាត់ធំ'],
+        specialtiesEn: ['24/7 Emergency', 'Cardiology', 'Surgery'],
+        query: 'Calmette Hospital Phnom Penh'
+      },
+      {
+        id: 'luangme',
+        nameKm: 'មន្ទីរពេទ្យហ្លួងម៉ែ (Luang Me Hospital)',
+        nameEn: 'Luang Me Hospital',
+        type: 'public',
+        addressKm: 'ខណ្ឌសែនសុខ រាជធានីភ្នំពេញ',
+        addressEn: 'Sen Sok District, Phnom Penh',
+        distanceKm: '2.5',
+        phone: '023 888 119',
+        emergency24h: true,
+        specialtiesKm: ['សង្គ្រោះបន្ទាន់', 'មហារីក/រស្មីព្យាបាល', 'ពិនិត្យទូទៅ'],
+        specialtiesEn: ['Emergency Care', 'Oncology', 'General Medicine'],
+        query: 'Luang Me Hospital Sen Sok Phnom Penh'
+      },
+      {
+        id: 'khmersoviet',
+        nameKm: 'មន្ទីរពេទ្យមិត្តភាពខ្មែរ-សូវៀត (Khmer-Soviet Friendship)',
+        nameEn: 'Khmer-Soviet Friendship Hospital',
+        type: 'public',
+        addressKm: 'ផ្លូវ ២៧១ សង្កាត់ទំនប់ទឹក រាជធានីភ្នំពេញ',
+        addressEn: 'St 271, Yothapol Khemarak Phoumin Blvd, Phnom Penh',
+        distanceKm: '4.8',
+        phone: '023 217 764',
+        emergency24h: true,
+        specialtiesKm: ['សង្គ្រោះបន្ទាន់', 'ជំងឺឆ្លង', 'ពិនិត្យទូទៅ'],
+        specialtiesEn: ['24/7 ICU', 'Infectious Diseases', 'General Care'],
+        query: 'Khmer-Soviet Friendship Hospital Phnom Penh'
+      },
+      {
+        id: 'kanthabopha',
+        nameKm: 'មន្ទីរពេទ្យកុមារគន្ធបុប្ផា (Kantha Bopha Hospital)',
+        nameEn: 'Kantha Bopha Children\'s Hospital',
+        type: 'public',
+        addressKm: 'វត្តភ្នំ រាជធានីភ្នំពេញ',
+        addressEn: 'Wat Phnom, Phnom Penh',
+        distanceKm: '1.8',
+        phone: '023 722 012',
+        emergency24h: true,
+        specialtiesKm: ['ព្យាបាលកុមារឥតគិតថ្លៃ', 'សង្គ្រោះបន្ទាន់កុមារ', 'វះកាត់កុមារ'],
+        specialtiesEn: ['Free Child Healthcare', 'Pediatric ICU', 'Pediatric Surgery'],
+        query: 'Kantha Bopha Childrens Hospital Phnom Penh'
+      },
+      {
+        id: 'sunrisejapan',
+        nameKm: 'មន្ទីរពេទ្យ ស៊ុនរ៉ាយស៍ ជប៉ុន (Sunrise Japan Hospital)',
+        nameEn: 'Sunrise Japan Hospital Phnom Penh',
+        type: 'private',
+        addressKm: 'ជ្រោយចង្វារ រាជធានីភ្នំពេញ',
+        addressEn: 'Chroy Changvar, Phnom Penh',
+        distanceKm: '5.1',
+        phone: '023 260 152',
+        emergency24h: true,
+        specialtiesKm: ['សរសៃប្រសាទ', 'សង្គ្រោះបន្ទាន់', 'ស្តង់ដារជប៉ុន'],
+        specialtiesEn: ['Neuroscience', 'Emergency', 'Japanese Quality'],
+        query: 'Sunrise Japan Hospital Phnom Penh'
+      }
+    ];
+
+    // Shared Initial Posts Feed
+    window.postsData = [
+      {
+        id: 'post-1',
+        uid: 'sys-admin',
+        authorNameKm: 'ក្រុមការងារសុខភាពយើង (Verified Official)',
+        authorNameEn: 'Sokhapheap Yeang Health Team',
+        authorAvatar: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=200&q=80',
+        roleBadge: 'Verified Specialist',
+        category: 'firstaid',
+        timeKm: '១ ម៉ោងមុន',
+        timeEn: '1h ago',
+        contentKm: '🚨 ការសង្គ្រោះបឋមពេលមានអាការៈគាំងបេះដូងភ្លាមៗ៖\n១. ហៅទូរស័ព្ទទៅកាន់លេខសង្គ្រោះបន្ទាន់ 119 ជាប្រញាប់\n២. ធ្វើការចុចទ្រូង (CPR) ឲ្យបាន ១០០-១២០ ដងក្នុងមួយនាទី\n៣. រក្សាចលនាដង្ហើមអ្នកជំងឺរហូតដល់ក្រុមសង្គ្រោះមកដល់!',
+        contentEn: '🚨 First Aid for Sudden Cardiac Arrest:\n1. Call emergency hotline 119 immediately\n2. Perform chest compressions (CPR) at 100-120 bpm\n3. Keep airways open until help arrives!',
+        image: 'https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=600&q=80',
+        likes: 128,
+        isLiked: false,
+        isBookmarked: true,
+        comments: [
+          { author: 'សុខា (Patient)', text: 'ព័ត៌មានមានប្រយោជន៍ខ្លាំងណាស់!' }
+        ]
+      },
+      {
+        id: 'post-2',
+        uid: 'dr-chanthou',
+        authorNameKm: 'លោកគ្រូពេទ្យ ចន្ទថូ (Dr. Chanthou, MD)',
+        authorNameEn: 'Dr. Chanthou, MD',
+        authorAvatar: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=200&q=80',
+        roleBadge: 'Healthcare Provider',
+        category: 'nutrition',
+        timeKm: '៣ ម៉ោងមុន',
+        timeEn: '3h ago',
+        contentKm: '🥗 របបអាហារសុខភាពការពារជំងឺសម្ពាធឈាមខ្ពស់៖\nកាត់បន្ថយការញ៉ាំប្រៃ ញ៉ាំបន្លែបៃតងឲ្យបានច្រើន និងផឹកទឹកយ៉ាងហោចណាស់ ២លីត្រក្នុងមួយថ្ងៃ។',
+        contentEn: '🥗 Healthy diet to prevent hypertension:\nReduce sodium intake, consume more green vegetables, and drink at least 2 liters of water daily.',
+        image: 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=600&q=80',
+        likes: 64,
+        isLiked: true,
+        isBookmarked: false,
+        comments: []
+      }
+    ];
+
+
+    // Check Login Lock Screen Status
+    function verifyAuthLockStatus() {
+      const lockScreen = document.getElementById('auth-lock-screen');
+      if (!window.currentUser) {
+        lockScreen.classList.remove('hidden');
+      } else {
+        lockScreen.classList.add('hidden');
+        syncHeaderAndProfileUI();
+      }
+    }
+
+    // Switch between Sign In / Register
+    window.switchAuthAction = function(action) {
+      window.authAction = action;
+      const errorBox = document.getElementById('auth-error-box');
+      errorBox.classList.add('hidden');
+
+      const loginBtn = document.getElementById('auth-action-login');
+      const registerBtn = document.getElementById('auth-action-register');
+      const nameField = document.getElementById('auth-field-name');
+      const roleField = document.getElementById('auth-field-role');
+      const submitBtnText = document.getElementById('auth-submit-btn-text');
+
+      if (action === 'login') {
+        loginBtn.className = "w-1/2 py-2 rounded-xl bg-khmerTeal-700 text-white shadow transition";
+        registerBtn.className = "w-1/2 py-2 rounded-xl text-slate-500 transition";
+        nameField.classList.add('hidden');
+        roleField.classList.add('hidden');
+        submitBtnText.innerText = window.currentLanguage === 'km' ? 'ចូលប្រើប្រាស់' : 'Sign In';
+      } else {
+        registerBtn.className = "w-1/2 py-2 rounded-xl bg-khmerTeal-700 text-white shadow transition";
+        loginBtn.className = "w-1/2 py-2 rounded-xl text-slate-500 transition";
+        nameField.classList.remove('hidden');
+        roleField.classList.remove('hidden');
+        submitBtnText.innerText = window.currentLanguage === 'km' ? 'បង្កើតគណនី' : 'Register Now';
+      }
+    };
+
+    // Switch between Phone vs Email
+    window.switchAuthMode = function(mode) {
+      window.authMode = mode;
+      document.getElementById('auth-error-box').classList.add('hidden');
+
+      if (mode === 'phone') {
+        document.getElementById('auth-mode-phone').classList.remove('hidden');
+        document.getElementById('auth-mode-email').classList.add('hidden');
+        document.getElementById('auth-tab-phone').className = "w-1/2 py-1.5 border-b-2 border-khmerTeal-700 text-khmerTeal-700";
+        document.getElementById('auth-tab-email').className = "w-1/2 py-1.5 border-b-2 border-transparent text-slate-400";
+      } else {
+        document.getElementById('auth-mode-phone').classList.add('hidden');
+        document.getElementById('auth-mode-email').classList.remove('hidden');
+        document.getElementById('auth-tab-phone').className = "w-1/2 py-1.5 border-b-2 border-transparent text-slate-400";
+        document.getElementById('auth-tab-email').className = "w-1/2 py-1.5 border-b-2 border-khmerTeal-700 text-khmerTeal-700";
+      }
+    };
+
+    // Strict Auth Submit Handling with Password Verification
+    window.handleAuthSubmit = function() {
+      const errorBox = document.getElementById('auth-error-box');
+      const errorMsg = document.getElementById('auth-error-msg');
+      errorBox.classList.add('hidden');
+
+      let contactKey = '';
+      if (window.authMode === 'phone') {
+        const rawPhone = document.getElementById('auth-phone-input').value.trim();
+        if (!rawPhone) {
+          errorMsg.innerText = window.currentLanguage === 'km' ? 'សូមបញ្ចូលលេខទូរស័ព្ទ!' : 'Please enter phone number!';
+          errorBox.classList.remove('hidden');
+          return;
+        }
+        contactKey = '+855' + rawPhone.replace(/^0+/, '');
+      } else {
+        const email = document.getElementById('auth-email-input').value.trim().toLowerCase();
+        if (!email || !email.includes('@')) {
+          errorMsg.innerText = window.currentLanguage === 'km' ? 'សូមបញ្ចូលអ៊ីមែលត្រឹមត្រូវ!' : 'Please enter valid email!';
+          errorBox.classList.remove('hidden');
+          return;
+        }
+        contactKey = email;
+      }
+
+      const password = document.getElementById('auth-password-input').value;
+      if (!password || password.length < 6) {
+        errorMsg.innerText = window.currentLanguage === 'km' 
+          ? 'ពាក្យសម្ងាត់ត្រូវមានយ៉ាងហោចណាស់ ៦ ខ្ទង់!' 
+          : 'Password must be at least 6 characters!';
+        errorBox.classList.remove('hidden');
+        return;
+      }
+
+      // Action: REGISTER
+      if (window.authAction === 'register') {
+        const fullName = document.getElementById('auth-name-input').value.trim();
+        if (!fullName) {
+          errorMsg.innerText = window.currentLanguage === 'km' ? 'សូមបញ្ចូលឈ្មោះពេញរបស់អ្នក!' : 'Please enter your full name!';
+          errorBox.classList.remove('hidden');
+          return;
+        }
+
+        // Check single-account integrity per phone/email
+        const existingAcc = window.registeredAccounts.find(a => a.contactKey === contactKey);
+        if (existingAcc) {
+          errorMsg.innerText = window.currentLanguage === 'km'
+            ? 'អ៊ីមែល ឬលេខទូរស័ព្ទនេះត្រូវបានប្រើប្រាស់រួចហើយ! / This Email or Phone Number is already registered!'
+            : 'This Email or Phone Number is already registered!';
+          errorBox.classList.remove('hidden');
+          return;
+        }
+
+        const role = document.getElementById('auth-role-select').value;
+        const newAccount = {
+          uid: 'user-' + Date.now(),
+          contactKey: contactKey,
+          name: fullName,
+          passwordHash: password,
+          role: role,
+          avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+          bio: 'សូមស្វាគមន៍មកកាន់គណនីសុខភាពខ្ញុំ! ចូលចិត្តថែទាំសុខភាព និងចែករំលែកបទពិសោធន៍។',
+          joinedYear: new Date().getFullYear().toString()
+        };
+
+        window.registeredAccounts.push(newAccount);
+        localStorage.setItem(STORAGE_KEY_ACCOUNTS, JSON.stringify(window.registeredAccounts));
+
+        window.currentUser = newAccount;
+        localStorage.setItem(STORAGE_KEY_SESSION, JSON.stringify(window.currentUser));
+
+        verifyAuthLockStatus();
+        showToastNotification(window.currentLanguage === 'km' ? 'បង្កើតគណនីជោគជ័យ!' : 'Account registered successfully!');
+      } 
+      // Action: LOGIN
+      else {
+        const foundAcc = window.registeredAccounts.find(a => a.contactKey === contactKey);
+        
+        if (!foundAcc || foundAcc.passwordHash !== password) {
+          errorMsg.innerText = window.currentLanguage === 'km'
+            ? 'អ៊ីមែល/លេខទូរស័ព្ទ ឬពាក្យសម្ងាត់មិនត្រឹមត្រូវ! / Incorrect credentials or password!'
+            : 'Incorrect credentials or password!';
+          errorBox.classList.remove('hidden');
+          return;
+        }
+
+        window.currentUser = foundAcc;
+        localStorage.setItem(STORAGE_KEY_SESSION, JSON.stringify(window.currentUser));
+
+        verifyAuthLockStatus();
+        showToastNotification(window.currentLanguage === 'km' ? 'ចូលប្រើប្រាស់ជោគជ័យ!' : 'Signed in successfully!');
+      }
+    };
+
+    // Logout
+    window.handleUserLogout = function() {
+      localStorage.removeItem(STORAGE_KEY_SESSION);
+      window.currentUser = null;
+      verifyAuthLockStatus();
+      showToastNotification(window.currentLanguage === 'km' ? 'បានចាកចេញពីគណនី' : 'Signed out');
+    };
+
+
+    function syncHeaderAndProfileUI() {
+      if (!window.currentUser) return;
+
+      document.getElementById('header-user-name').innerText = window.currentUser.name;
+      document.getElementById('header-role-badge').innerText = window.currentUser.role === 'Healthcare Provider' ? 'Provider' : 'Member';
+      document.getElementById('header-account-contact').querySelector('span:last-child').innerText = window.currentUser.contactKey;
+      document.getElementById('header-user-avatar').src = window.currentUser.avatar;
+      document.getElementById('composer-user-avatar').src = window.currentUser.avatar;
+
+      // Profile Tab
+      document.getElementById('profile-card-name').innerText = window.currentUser.name;
+      document.getElementById('profile-card-handle').innerText = window.currentUser.contactKey;
+      document.getElementById('profile-card-role').innerText = window.currentUser.role;
+      document.getElementById('profile-card-avatar').src = window.currentUser.avatar;
+      document.getElementById('profile-card-bio').innerText = window.currentUser.bio;
+      document.getElementById('user-stat-joined').innerText = window.currentUser.joinedYear || '2026';
+
+      const myPosts = window.postsData.filter(p => p.uid === window.currentUser.uid);
+      document.getElementById('user-stat-posts').innerText = myPosts.length;
+    }
+
+    window.openEditProfileModal = function() {
+      document.getElementById('edit-name-input').value = window.currentUser.name;
+      document.getElementById('edit-bio-input').value = window.currentUser.bio;
+      document.getElementById('edit-avatar-preview').src = window.currentUser.avatar;
+      window.selectedAvatarAttachment = window.currentUser.avatar;
+
+      document.getElementById('modal-edit-profile').classList.remove('hidden');
+    };
+
+    window.closeEditProfileModal = function() {
+      document.getElementById('modal-edit-profile').classList.add('hidden');
+    };
+
+    window.handleAvatarFileChange = function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          window.selectedAvatarAttachment = evt.target.result;
+          document.getElementById('edit-avatar-preview').src = window.selectedAvatarAttachment;
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+
+    window.saveUserProfileChanges = function() {
+      const name = document.getElementById('edit-name-input').value.trim();
+      const bio = document.getElementById('edit-bio-input').value.trim();
+
+      if (name) window.currentUser.name = name;
+      if (bio) window.currentUser.bio = bio;
+      if (window.selectedAvatarAttachment) window.currentUser.avatar = window.selectedAvatarAttachment;
+
+      // Update in accounts array
+      const accIdx = window.registeredAccounts.findIndex(a => a.uid === window.currentUser.uid);
+      if (accIdx !== -1) {
+        window.registeredAccounts[accIdx] = window.currentUser;
+        localStorage.setItem(STORAGE_KEY_ACCOUNTS, JSON.stringify(window.registeredAccounts));
+      }
+
+      localStorage.setItem(STORAGE_KEY_SESSION, JSON.stringify(window.currentUser));
+      syncHeaderAndProfileUI();
+      closeEditProfileModal();
+      showToastNotification(window.currentLanguage === 'km' ? 'បានរក្សាទុកព័ត៌មានគណនី!' : 'Profile updated!');
+    };
+
+    window.openChangePasswordModal = function() {
+      document.getElementById('change-old-password').value = '';
+      document.getElementById('change-new-password').value = '';
+      document.getElementById('change-pass-error').classList.add('hidden');
+      document.getElementById('modal-change-password').classList.remove('hidden');
+    };
+
+    window.closeChangePasswordModal = function() {
+      document.getElementById('modal-change-password').classList.add('hidden');
+    };
+
+    window.saveNewPassword = function() {
+      const oldP = document.getElementById('change-old-password').value;
+      const newP = document.getElementById('change-new-password').value;
+      const errEl = document.getElementById('change-pass-error');
+      errEl.classList.add('hidden');
+
+      if (oldP !== window.currentUser.passwordHash) {
+        errEl.innerText = window.currentLanguage === 'km' ? 'ពាក្យសម្ងាត់ចាស់មិនត្រឹមត្រូវ!' : 'Current password incorrect!';
+        errEl.classList.remove('hidden');
+        return;
+      }
+
+      if (!newP || newP.length < 6) {
+        errEl.innerText = window.currentLanguage === 'km' ? 'ពាក្យសម្ងាត់ថ្មីត្រូវមានយ៉ាងហោចណាស់ ៦ ខ្ទង់!' : 'New password min 6 chars!';
+        errEl.classList.remove('hidden');
+        return;
+      }
+
+      window.currentUser.passwordHash = newP;
+      const accIdx = window.registeredAccounts.findIndex(a => a.uid === window.currentUser.uid);
+      if (accIdx !== -1) {
+        window.registeredAccounts[accIdx].passwordHash = newP;
+        localStorage.setItem(STORAGE_KEY_ACCOUNTS, JSON.stringify(window.registeredAccounts));
+      }
+      localStorage.setItem(STORAGE_KEY_SESSION, JSON.stringify(window.currentUser));
+
+      closeChangePasswordModal();
+      showToastNotification(window.currentLanguage === 'km' ? 'ពាក្យសម្ងាត់ត្រូវបានផ្លាស់ប្តូរ!' : 'Password changed successfully!');
+    };
+
+
+    window.switchTab = function(tabId) {
+      const tabs = ['tab-home', 'tab-map', 'tab-create', 'tab-notifications', 'tab-profile'];
+      tabs.forEach(id => document.getElementById(id).classList.add('hidden'));
+      document.getElementById(tabId).classList.remove('hidden');
+
+      document.querySelectorAll('.nav-item').forEach(el => {
+        el.classList.remove('text-khmerTeal-700', 'active-nav');
+        el.classList.add('text-slate-400');
+      });
+
+      const activeNav = document.getElementById('nav-' + tabId);
+      if(activeNav) {
+        activeNav.classList.remove('text-slate-400');
+        activeNav.classList.add('text-khmerTeal-700', 'active-nav');
+      }
+    };
+
+    window.toggleLanguage = function(forcedLang) {
+      window.currentLanguage = forcedLang || (window.currentLanguage === 'km' ? 'en' : 'km');
+      document.getElementById('lang-indicator').innerText = window.currentLanguage === 'km' ? 'EN' : 'KM';
+      document.getElementById('profile-lang-indicator').innerText = window.currentLanguage === 'km' ? 'ភាសាខ្មែរ 🇰🇭' : 'English 🇬🇧';
+
+      document.querySelectorAll('[data-km]').forEach(el => {
+        const text = window.currentLanguage === 'km' ? el.getAttribute('data-km') : el.getAttribute('data-en');
+        if(text) el.innerText = text;
+      });
+
+      document.querySelectorAll('[data-km-placeholder]').forEach(el => {
+        const ph = window.currentLanguage === 'km' ? el.getAttribute('data-km-placeholder') : el.getAttribute('data-en-placeholder');
+        if(ph) el.placeholder = ph;
+      });
+
+      renderFeedPosts();
+      renderHospitalsList(window.hospitalsData);
+      renderSavedBookmarks();
+    };
+
+    window.updateMapLocation = function(searchQuery, regionName) {
+      const iframe = document.getElementById('google-maps-iframe');
+      const encoded = encodeURIComponent(searchQuery);
+      iframe.src = `https://www.google.com/maps?q=${encoded}&output=embed`;
+
+      document.querySelectorAll('.region-btn').forEach(btn => {
+        btn.classList.remove('bg-khmerTeal-700', 'text-white');
+        btn.classList.add('bg-white', 'text-slate-600');
+      });
+      if(event && event.currentTarget) {
+        event.currentTarget.classList.remove('bg-white', 'text-slate-600');
+        event.currentTarget.classList.add('bg-khmerTeal-700', 'text-white');
+      }
+
+      showToastNotification(`បង្ហាញទីតាំង៖ ${regionName}`);
+    };
+
+    window.requestUserLocation = function() {
+      if(navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+            const iframe = document.getElementById('google-maps-iframe');
+            iframe.src = `https://www.google.com/maps?q=hospitals+near+${lat},${lng}&output=embed`;
+            showToastNotification('បានធ្វើបច្ចុប្បន្នភាពទីតាំងមន្ទីរពេទ្យនៅជិតអ្នក!');
+          },
+          () => { updateMapLocation('hospitals in Phnom Penh, Cambodia', 'ភ្នំពេញ'); }
+        );
+      } else {
+        updateMapLocation('hospitals in Phnom Penh, Cambodia', 'ភ្នំពេញ');
+      }
+    };
+
+    window.filterFeedCategory = function(cat) {
+      document.querySelectorAll('.feed-cat-btn').forEach(btn => {
+        btn.classList.remove('bg-khmerTeal-700', 'text-white');
+        btn.classList.add('bg-white', 'text-slate-600');
+      });
+      if (event && event.currentTarget) {
+        event.currentTarget.classList.remove('bg-white', 'text-slate-600');
+        event.currentTarget.classList.add('bg-khmerTeal-700', 'text-white');
+      }
+
+      if(cat === 'all') {
+        renderFeedPosts(window.postsData);
+      } else {
+        renderFeedPosts(window.postsData.filter(p => p.category === cat));
+      }
+    };
+
+    function renderFeedPosts(list = window.postsData) {
+      const container = document.getElementById('posts-feed-container');
+      if(!container) return;
+      container.innerHTML = '';
+
+      list.forEach(post => {
+        const postCard = document.createElement('div');
+        postCard.className = "bg-white rounded-2xl p-3.5 shadow-sm border border-slate-200 space-y-2.5 font-khmer";
+
+        const contentText = window.currentLanguage === 'km' ? post.contentKm : post.contentEn;
+        const authorName = window.currentLanguage === 'km' ? post.authorNameKm : post.authorNameEn;
+
+        postCard.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2.5">
+              <img src="${post.authorAvatar}" class="w-9 h-9 rounded-full object-cover border border-khmerTeal-700 shrink-0" alt="Author">
+              <div>
+                <h4 class="font-bold text-xs text-slate-800 flex items-center gap-1">
+                  ${authorName}
+                  ${post.roleBadge ? `<span class="bg-amber-100 text-amber-900 text-[9px] px-1.5 py-0.2 rounded font-bold">✓</span>` : ''}
+                </h4>
+                <p class="text-[10px] text-khmerTeal-700 font-semibold">${post.timeKm} • ${post.category.toUpperCase()}</p>
+              </div>
+            </div>
+          </div>
+
+          <p class="text-xs text-slate-700 leading-relaxed whitespace-pre-line">${contentText}</p>
+
+          ${post.image ? `<img src="${post.image}" class="w-full h-40 object-cover rounded-xl border border-slate-100" alt="Attachment">` : ''}
+
+          <div class="flex items-center justify-between pt-2 border-t border-slate-100 text-xs text-slate-500 font-medium">
+            <button onclick="toggleLikePost('${post.id}')" class="flex items-center space-x-1 ${post.isLiked ? 'text-rose-600 font-bold' : 'hover:text-slate-800'}">
+              <i data-lucide="heart" class="w-4 h-4 ${post.isLiked ? 'fill-rose-600' : ''}"></i>
+              <span>${post.likes}</span>
+            </button>
+
+            <button onclick="openCommentsModal('${post.id}')" class="flex items-center space-x-1 hover:text-slate-800">
+              <i data-lucide="message-circle" class="w-4 h-4 text-khmerTeal-700"></i>
+              <span>${post.comments.length}</span>
+            </button>
+
+            <button onclick="toggleBookmarkPost('${post.id}')" class="flex items-center space-x-1 ${post.isBookmarked ? 'text-khmerGold-600 font-bold' : 'hover:text-slate-800'}">
+              <i data-lucide="bookmark" class="w-4 h-4 ${post.isBookmarked ? 'fill-khmerGold-500' : ''}"></i>
+            </button>
+
+            <button onclick="showToastNotification('បានចម្លងតំណភ្ជាប់អត្ថបទ!')" class="flex items-center space-x-1 hover:text-slate-800">
+              <i data-lucide="share-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+        `;
+        container.appendChild(postCard);
+      });
+      if(window.lucide) lucide.createIcons();
+    }
+
+    window.handleImageUpload = function(e) {
+      const file = e.target.files[0];
+      if(file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          window.selectedImageAttachment = evt.target.result;
+          document.getElementById('attachment-preview-img').src = window.selectedImageAttachment;
+          document.getElementById('post-attachment-preview').classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+
+    window.clearPostAttachment = function() {
+      window.selectedImageAttachment = null;
+      document.getElementById('post-attachment-preview').classList.add('hidden');
+    };
+
+    window.createNewPost = function() {
+      if (!window.currentUser) return;
+      const input = document.getElementById('post-input-text');
+      const val = input.value.trim();
+      const cat = document.getElementById('post-category-select').value;
+      if(!val && !window.selectedImageAttachment) return;
+
+      const newPost = {
+        id: 'post-' + Date.now(),
+        uid: window.currentUser.uid,
+        authorNameKm: window.currentUser.name,
+        authorNameEn: window.currentUser.name,
+        authorAvatar: window.currentUser.avatar,
+        roleBadge: window.currentUser.role,
+        category: cat,
+        timeKm: 'ទើបតែឥឡូវ',
+        timeEn: 'Just now',
+        contentKm: val,
+        contentEn: val,
+        image: window.selectedImageAttachment,
+        likes: 1,
+        isLiked: true,
+        isBookmarked: false,
+        comments: []
+      };
+
+      window.postsData.unshift(newPost);
+      input.value = '';
+      clearPostAttachment();
+      renderFeedPosts();
+      syncHeaderAndProfileUI();
+      showToastNotification(window.currentLanguage === 'km' ? 'បានផុសអត្ថបទជោគជ័យ!' : 'Post published!');
+    };
+
+    window.handleFullImageUpload = function(e) {
+      const file = e.target.files[0];
+      if(file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          window.selectedFullImageAttachment = evt.target.result;
+          document.getElementById('full-preview-img').src = window.selectedFullImageAttachment;
+          document.getElementById('full-attachment-preview').classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+
+    window.submitFullPost = function() {
+      if (!window.currentUser) return;
+      const txt = document.getElementById('tab-create-text').value.trim();
+      const cat = document.getElementById('tab-create-category').value;
+      if(!txt && !window.selectedFullImageAttachment) return;
+
+      const newPost = {
+        id: 'post-' + Date.now(),
+        uid: window.currentUser.uid,
+        authorNameKm: window.currentUser.name,
+        authorNameEn: window.currentUser.name,
+        authorAvatar: window.currentUser.avatar,
+        roleBadge: window.currentUser.role,
+        category: cat,
+        timeKm: 'ទើបតែឥឡូវ',
+        timeEn: 'Just now',
+        contentKm: txt,
+        contentEn: txt,
+        image: window.selectedFullImageAttachment,
+        likes: 0,
+        isLiked: false,
+        isBookmarked: false,
+        comments: []
+      };
+
+      window.postsData.unshift(newPost);
+
+      document.getElementById('tab-create-text').value = '';
+      document.getElementById('full-attachment-preview').classList.add('hidden');
+      window.selectedFullImageAttachment = null;
+      switchTab('tab-home');
+      renderFeedPosts();
+      syncHeaderAndProfileUI();
+      showToastNotification(window.currentLanguage === 'km' ? 'បានចែករំលែកអត្ថបទជោគជ័យ!' : 'Health post published!');
+    };
+
+    window.toggleLikePost = function(id) {
+      const p = window.postsData.find(post => post.id === id);
+      if(p) {
+        p.isLiked = !p.isLiked;
+        p.likes += p.isLiked ? 1 : -1;
+        renderFeedPosts();
+      }
+    };
+
+    window.toggleBookmarkPost = function(id) {
+      const p = window.postsData.find(post => post.id === id);
+      if(p) {
+        p.isBookmarked = !p.isBookmarked;
+        renderFeedPosts();
+        renderSavedBookmarks();
+        showToastNotification(p.isBookmarked ? 'បានរក្សាទុកអត្ថបទ!' : 'បានលុបចេញពីបញ្ជីរក្សាទុក');
+      }
+    };
+
+    window.filterHospitals = function(type) {
+      document.querySelectorAll('.hosp-filter-btn').forEach(btn => {
+        btn.classList.remove('bg-khmerTeal-700', 'text-white');
+        btn.classList.add('bg-white', 'text-slate-600');
+      });
+      if (event && event.currentTarget) {
+        event.currentTarget.classList.remove('bg-white', 'text-slate-600');
+        event.currentTarget.classList.add('bg-khmerTeal-700', 'text-white');
+      }
+
+      if(type === 'all') {
+        renderHospitalsList(window.hospitalsData);
+      } else if(type === '24h') {
+        renderHospitalsList(window.hospitalsData.filter(h => h.emergency24h));
+      } else {
+        renderHospitalsList(window.hospitalsData.filter(h => h.type === type));
+      }
+    };
+
+    function renderHospitalsList(list) {
+      const container = document.getElementById('hospitals-list-container');
+      if(!container) return;
+      container.innerHTML = '';
+
+      list.forEach(hosp => {
+        const card = document.createElement('div');
+        card.className = "bg-white rounded-2xl p-3 shadow-sm border border-slate-200 space-y-2 font-khmer";
+        
+        const hospName = window.currentLanguage === 'km' ? hosp.nameKm : hosp.nameEn;
+        const address = window.currentLanguage === 'km' ? hosp.addressKm : hosp.addressEn;
+        const specs = window.currentLanguage === 'km' ? hosp.specialtiesKm : hosp.specialtiesEn;
+
+        card.innerHTML = `
+          <div class="flex items-start justify-between">
+            <div>
+              <h3 class="font-bold text-xs text-slate-800">${hospName}</h3>
+              <p class="text-[10px] text-slate-500 flex items-center gap-1 mt-0.5">
+                <i data-lucide="map-pin" class="w-3 h-3 text-khmerTeal-700"></i>
+                <span>${address}</span>
+              </p>
+            </div>
+            <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full shrink-0">
+              ${hosp.distanceKm} km
+            </span>
+          </div>
+
+          <div class="flex flex-wrap gap-1">
+            ${specs.map(s => `<span class="bg-slate-100 text-slate-600 text-[10px] px-2 py-0.2 rounded">${s}</span>`).join('')}
+          </div>
+
+          <div class="flex items-center justify-between pt-1 border-t border-slate-100">
+            <a href="tel:${hosp.phone}" class="text-xs font-bold text-rose-600 flex items-center gap-1">
+              <i data-lucide="phone" class="w-3.5 h-3.5"></i>
+              <span>${hosp.phone}</span>
+            </a>
+            <div class="flex items-center space-x-1.5">
+              <button onclick="updateMapLocation('${hosp.query}', '${hosp.nameKm}')" class="bg-amber-100 text-amber-800 text-[11px] font-semibold px-2.5 py-1 rounded-lg">
+                ${window.currentLanguage === 'km' ? 'មើលលើផែនទី' : 'View Map'}
+              </button>
+              <button onclick="openHospitalDetail('${hosp.id}')" class="bg-khmerTeal-700 text-white text-[11px] font-semibold px-2.5 py-1 rounded-lg">
+                ${window.currentLanguage === 'km' ? 'ព័ត៌មាន' : 'Details'}
+              </button>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+      if(window.lucide) lucide.createIcons();
+    }
+
+    window.openHospitalDetail = function(id) {
+      const hosp = window.hospitalsData.find(h => h.id === id) || window.hospitalsData[0];
+      document.getElementById('hosp-detail-title').innerText = window.currentLanguage === 'km' ? hosp.nameKm : hosp.nameEn;
+      document.getElementById('hosp-detail-badge').innerText = `${hosp.distanceKm} km • 24/7 Emergency`;
+
+      document.getElementById('hosp-detail-body').innerHTML = `
+        <p>📍 <strong>${window.currentLanguage === 'km' ? 'អាសយដ្ឋាន' : 'Address'}:</strong> ${window.currentLanguage === 'km' ? hosp.addressKm : hosp.addressEn}</p>
+        <p>☎️ <strong>${window.currentLanguage === 'km' ? 'លេខទំនាក់ទំនង' : 'Contact'}:</strong> ${hosp.phone}</p>
+        <p>🏥 <strong>${window.currentLanguage === 'km' ? 'សេវាព្យាបាល' : 'Services'}:</strong> ${(window.currentLanguage === 'km' ? hosp.specialtiesKm : hosp.specialtiesEn).join(', ')}</p>
+      `;
+
+      document.getElementById('hosp-detail-call').href = `tel:${hosp.phone}`;
+      document.getElementById('hosp-detail-nav').href = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(hosp.query)}`;
+
+      document.getElementById('modal-hospital-detail').classList.remove('hidden');
+    };
+
+    window.closeHospitalDetail = function() {
+      document.getElementById('modal-hospital-detail').classList.add('hidden');
+    };
+
+    window.openCommentsModal = function(postId) {
+      window.activePostCommentId = postId;
+      const post = window.postsData.find(p => p.id === postId);
+      const container = document.getElementById('comments-list-container');
+      container.innerHTML = '';
+
+      if (post && post.comments) {
+        post.comments.forEach(c => {
+          const item = document.createElement('div');
+          item.className = "bg-slate-100 p-2.5 rounded-xl space-y-0.5";
+          item.innerHTML = `
+            <strong class="font-bold text-slate-800 text-[11px]">${c.author}</strong>
+            <p class="text-slate-700">${c.text}</p>
+          `;
+          container.appendChild(item);
+        });
+      }
+
+      document.getElementById('modal-comments').classList.remove('hidden');
+    };
+
+    window.closeCommentsModal = function() {
+      document.getElementById('modal-comments').classList.add('hidden');
+    };
+
+    window.submitNewComment = function() {
+      const input = document.getElementById('comment-input-text');
+      const val = input.value.trim();
+      if(!val || !window.activePostCommentId || !window.currentUser) return;
+
+      const post = window.postsData.find(p => p.id === window.activePostCommentId);
+      if(post) {
+        post.comments.push({ author: window.currentUser.name, text: val });
+        input.value = '';
+        openCommentsModal(window.activePostCommentId);
+        renderFeedPosts();
+      }
+    };
+
+    function renderSavedBookmarks() {
+      const container = document.getElementById('saved-bookmarks-container');
+      if(!container) return;
+      const savedPosts = window.postsData.filter(p => p.isBookmarked);
+
+      if(savedPosts.length === 0) {
+        container.innerHTML = `<p class="text-[11px] text-slate-400 italic font-khmer">មិនទាន់មានអត្ថបទបានរក្សាទុក</p>`;
+      } else {
+        container.innerHTML = savedPosts.map(p => `
+          <div class="p-2 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center font-khmer">
+            <div class="text-xs text-slate-700 truncate max-w-[240px]">${p.contentKm}</div>
+            <i data-lucide="bookmark-check" class="w-4 h-4 text-khmerGold-600 shrink-0"></i>
+          </div>
+        `).join('');
+      }
+      if(window.lucide) lucide.createIcons();
+    }
+
+    window.handleGlobalSearch = function() {
+      const query = document.getElementById('global-search-input').value.toLowerCase().trim();
+      if(!query) {
+        renderFeedPosts(window.postsData);
+        renderHospitalsList(window.hospitalsData);
+        return;
+      }
+
+      const filteredPosts = window.postsData.filter(p => p.contentKm.toLowerCase().includes(query) || p.contentEn.toLowerCase().includes(query));
+      const filteredHospitals = window.hospitalsData.filter(h => h.nameKm.toLowerCase().includes(query) || h.addressKm.toLowerCase().includes(query));
+
+      renderFeedPosts(filteredPosts);
+      renderHospitalsList(filteredHospitals);
+    };
+
+    window.showToastNotification = function(msg) {
+      const container = document.getElementById('toast-container');
+      if(!container) return;
+      const toast = document.createElement('div');
+      toast.className = "bg-slate-900/90 text-white font-khmer text-xs px-3.5 py-2 rounded-xl shadow-xl border border-khmerGold-500/40 backdrop-blur-md flex items-center space-x-2 pointer-events-auto";
+      toast.innerHTML = `
+        <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+        <span>${msg}</span>
+      `;
+      container.appendChild(toast);
+      if(window.lucide) lucide.createIcons();
+
+      setTimeout(() => { toast.remove(); }, 3000);
+    };
+
+    // Initial Launch Setup
+    window.addEventListener('DOMContentLoaded', () => {
+      if(window.lucide) lucide.createIcons();
+      verifyAuthLockStatus();
+      renderFeedPosts();
+      renderHospitalsList(window.hospitalsData);
+      renderSavedBookmarks();
+    });
+  </script>
+</body>
+</html>
